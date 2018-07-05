@@ -13,6 +13,7 @@ var MongoClient = require('mongodb').MongoClient;
 
 var url = process.env.NODE_ENV == 'production' ? process.env.MONGODB_URI : "mongodb://localhost:27017/";
 
+
 // Any get request would be routed to the home page
 app.get('*', (req, res) => {
   res.send(JSON.stringify({
@@ -27,7 +28,7 @@ app.post('/mock-submit-api',(req, res) => {
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
 
-    const dbo = db.db("mock-apis");
+    const dbo = db.db("heroku_j59dvfgm");
 
     // Fetch the values
     const endpoint = req.body.endpoint;
