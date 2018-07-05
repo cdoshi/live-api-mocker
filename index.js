@@ -2,17 +2,34 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 
-app.use(bodyParser.json());
+// Create a client to mongodb
+const MongoClient = require('mongodb').MongoClient;
+const url = process.env.NODE_ENV == 'production' ? process.env.MONGODB_URI : "mongodb://localhost:27017/";
 
+// Below two lines are needed to read the params from POST request
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-// Create a client to mongodb
-var MongoClient = require('mongodb').MongoClient;
 
-var url = process.env.NODE_ENV == 'production' ? process.env.MONGODB_URI : "mongodb://localhost:27017/";
-
+app.use(function(req, res, next) {
+  if (req.method === 'OPTIONS') {
+    console.log('!OPTIONS');
+    var headers = {};
+    // IE8 does not allow domains to be specified, just the *
+    // headers["Access-Control-Allow-Origin"] = req.headers.origin;
+    headers["Access-Control-Allow-Origin"] = "*";
+    headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
+    headers["Access-Control-Allow-Credentials"] = false;
+    headers["Access-Control-Max-Age"] = '86400'; // 24 hours
+    headers["Access-Control-Allow-Headers"] = "X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept";
+    res.writeHead(200, headers);
+    res.end();
+  } else {
+    next();
+  }
+});
 
 // Any get request would be routed to the home page
 app.get('*', (req, res) => {
@@ -25,7 +42,8 @@ app.get('*', (req, res) => {
 app.post('/mock-submit-api',(req, res) => {
 
   // Connect to the DB
-  MongoClient.connect(url, function(err, db) {
+  MongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
+
     if (err) throw err;
 
     const dbo = db.db("heroku_j59dvfgm");
@@ -54,20 +72,20 @@ app.post('/mock-submit-api',(req, res) => {
 app.post('*', (req, res) => {
 
   // Connect to the DB
-  MongoClient.connect(url, function(err, db) {
+  MongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
     if (err) throw err;
 
     const dbo = db.db("heroku_j59dvfgm");
-
     const myObj = { endpoint: req.originalUrl };
 
-    console.log(req.originalUrl);
+    dbo.collection("apis").find(myObj).toArray(function(err, results = []){
+      if(results.length > 0) {
+          res.send(results[0].json);
+      } else {
+        res.send({status: false, message: 'No results found'});
+      }
 
-    dbo.collection("apis").find(myObj).toArray(function(err, results){
-      res.send(results[0].json)
     });
-
-
 
     // Close the db connection
     db.close();
