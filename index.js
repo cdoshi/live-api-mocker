@@ -57,7 +57,7 @@ app.post('*', (req, res) => {
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
 
-    const dbo = db.db("mock-apis");
+    const dbo = db.db("heroku_j59dvfgm");
 
     const myObj = { endpoint: req.originalUrl };
 
