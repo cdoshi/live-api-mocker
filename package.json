@@ -1,0 +1,21 @@
+{
+  "name": "live-mocker",
+  "version": "1.0.0",
+  "description": "makes mock api live instantly",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mock",
+    "api",
+    "live",
+    "json"
+  ],
+  "author": "Chiran Doshi",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3"
+  }
+}
