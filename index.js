@@ -10,8 +10,8 @@ app.use(bodyParser.urlencoded({
 
 // Create a client to mongodb
 var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/";
 
+var url = process.env.NODE_ENV == 'production' ? process.env.MONGODB_URI : "mongodb://localhost:27017/";
 
 // Any get request would be routed to the home page
 app.get('*', (req, res) => {
