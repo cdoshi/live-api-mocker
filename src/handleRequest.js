@@ -54,17 +54,16 @@ module.exports = function () {
   }
 
   /*
-   * Function that handles fetching of POST APIs
+   * Function that handles fetching of APIs of any method
    */
-  const fetchPostAPI = (req, res) => {
+  const fetchAPI = (req, res) => {
 
-    console.log(req.originalUrl);
     // Connect to the DB
     MongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
 
       const dbo = db.db('heroku_j59dvfgm');
-      const myObj = { endpoint: req.originalUrl };
+      const myObj = { endpoint: req.originalUrl, type: req.method.toUpperCase() };
 
       // Provide the latest one
       dbo.collection("apis").find(myObj).sort( { _id : -1 } ).limit(1).toArray(function(err, results = []){
@@ -80,32 +79,9 @@ module.exports = function () {
     });
   }
 
-  const fetchGetAPI = (req, res) => {
 
-    // Connect to the DB
-    MongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
-
-      if (err) throw err;
-
-      const dbo = db.db('heroku_j59dvfgm');
-      const myObj = { endpoint: req.originalUrl, type: 'GET' };
-
-      // Provide the latest one
-      dbo.collection("apis").find(myObj).sort( { 'date_added' : -1 } ).limit(1).toArray(function(err, results = []) {
-        if(results.length > 0) {
-            res.send(results[0].json);
-        } else {
-          res.send({status: false, message: 'No results found'});
-        }
-      });
-
-      // Close the db connection
-      db.close();
-    });
-  };
   return {
     mockSubmitAPI: mockSubmitAPI,
-    fetchPostAPI: fetchPostAPI,
-    fetchGetAPI: fetchGetAPI
+    fetchAPI: fetchAPI
   }
 };

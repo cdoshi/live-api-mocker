@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 
 // In case JSON parsing fails, send
 app.use(function(err, req, res, next) {
-  
+
   // Send error response
   res.status(200).send({
     status: false,
@@ -45,15 +45,13 @@ app.post('/mock-submit-api',(req, res) => {
   handleRequest.mockSubmitAPI(req, res);
 });
 
-// If any other get request is made apart from /mock-submit-api, check db and send back response
-app.post('*', (req, res) => {
-  handleRequest.fetchPostAPI(req, res);
-});
 
-// If any other post request is made apart from /, check db and send back response
-app.get('*', (req, res) => {
-  if(req.originalUrl.indexOf('assets') == -1) {
-    handleRequest.fetchGetAPI(req, res);
+// Generic method to handle any request
+app.all('*', (req, res, next) => {
+  if(req.method.toUpperCase() === 'GET' && req.originalUrl.indexOf('assets') > 0) {
+    next();
+  } else {
+    handleRequest.fetchAPI(req, res);
   }
 });
 
