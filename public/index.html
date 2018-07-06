@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Live API Mocker </title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+  <link rel = "stylesheet" type = "text/css" href = "/assets/snackbar.css" />
+  <style>
+  #inputEndpointLabel {
+    text-align: right;
+    padding-right: 0;
+  }
+  #container {
+    width: 90%;
+    margin: 0 auto;
+    margin-top: 20px;
+  }
+  #endpointDiv {
+    display: flex;
+  }
+  </style>
+
+</head>
+<body>
+  <div id="container">
+
+    <div>
+      <table>
+        <tbody>
+          <tr>
+            <td><label for="inputEndpoint" id="inputEndpointLabel">https://secure-inlet-13076.herokuapp.com</label></td>
+            <td><input type="text" class="form-control" id="inputEndpoint" placeholder="/users/v1"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br><br>
+      <div class="form-group">
+        <select class="form-control" id="methodType">
+          <option>POST</option>
+          <option>GET</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="jsonTextarea" id="textareaLabel">Paste your JSON here</label>
+        <textarea class="form-control" id="jsonTextarea" rows="10" data-toggle="tooltip" data-placement="top" title="Invalid JSON">{}</textarea>
+      </div>
+
+      <div class="form-group row">
+        <button type="submit" class="btn btn-primary btn-block" id="formSubmit">Submit</button>
+      </div>
+    </div>
+    <div id="snackbar"> Submitted successfully </div>
+    <script>
+
+    // Initialize the tooltip
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    // Show tooltip for 2 seconds before closing it
+    $("[data-toggle='tooltip']").on('shown.bs.tooltip', function(){
+      setTimeout(function() {
+        $('#jsonTextarea').tooltip('hide');
+      }, 2000);
+    });
+
+    // Trigger the tooltip manually via JS
+    $('#jsonTextarea').tooltip({trigger: 'manual'});
+
+    // Change the label on user entering endpoint
+    $('#inputEndpoint,#methodType').on('change input',function() {
+      var value = 'You will receive this JSON on hitting ' + $('#inputEndpointLabel').text() + $('#inputEndpoint').val() + ' (Method type: ' + $('#methodType').val() + ')';
+      $('#textareaLabel').text(value);
+    });
+
+    // Triggered on user clicking on submit button
+    $('#formSubmit').click(function() {
+      var endpoint = $('#inputEndpoint').val().trim();
+      var jsonText = $('#jsonTextarea').val().trim();
+
+      // If end point has not been provided focus it
+      if(!endpoint) {
+        $('#inputEndpoint').focus();
+        return false;
+      }
+
+      try {
+        jsonText = JSON.parse(jsonText);
+      } catch(e) {
+        $('#jsonTextarea').focus();
+        $('#jsonTextarea').tooltip('show');
+        return false;
+      }
+
+      // Submit the api
+      $.post('/mock-submit-api', {
+        endpoint: endpoint,
+        value: jsonText,
+        type: $('#methodType').val()
+      },function(response) {
+        debugger;
+        if(response.status == true) {
+          $('#snackbar').text('Submitted successfully!');
+          showSnackbar();
+        } else {
+          $('#snackbar').text('Something went wrong!');
+          showSnackbar();
+        }
+      });
+    });
+
+    function showSnackbar() {
+    // Get the snackbar DIV
+    var x = document.getElementById("snackbar");
+    // Add the "show" class to DIV
+    x.className = "show";
+    debugger;
+    // After 3 seconds, remove the show class from DIV
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
+    </script>
+  </body>
+  </html>
