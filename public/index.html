@@ -58,6 +58,15 @@
     <div id="snackbar"> Submitted successfully </div>
     <script>
 
+    // Detect text change and format json if needed
+    $('#jsonTextarea').on('blur',function() {
+      try {
+        var jsonText = $(this).val();
+        var jsonTextFormatted = JSON.stringify(JSON.parse(jsonText), undefined,4);
+        $(this).val(jsonTextFormatted);
+      } catch(e) {}
+    });
+
     // Initialize the tooltip
     $(function () {
       $('[data-toggle="tooltip"]').tooltip();
@@ -104,7 +113,6 @@
         value: jsonText,
         type: $('#methodType').val()
       },function(response) {
-        debugger;
         if(response.status == true) {
           $('#snackbar').text('Submitted successfully!');
           showSnackbar();
@@ -116,11 +124,13 @@
     });
 
     function showSnackbar() {
+
     // Get the snackbar DIV
     var x = document.getElementById("snackbar");
+
     // Add the "show" class to DIV
     x.className = "show";
-    debugger;
+
     // After 3 seconds, remove the show class from DIV
     setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
 }

@@ -4,6 +4,23 @@ const url = process.env.NODE_ENV == 'production' ? process.env.MONGODB_URI : "mo
 
 module.exports = function () {
 
+  const handleSlashes = (str) => {
+    var slashStr = str;
+
+    if(str && str.length > 0) {
+      // Beginning slash
+      if(str[0] !== '/') {
+        slashStr = '/' + slashStr;
+      }
+
+      if(str[str.length - 1] !== '/') {
+        slashStr = slashStr + '/';
+      }
+    }
+
+    return slashStr;
+  }
+
   /*
    * Function that handles submission of API
    */
@@ -29,7 +46,7 @@ module.exports = function () {
       try {
         const dbo = db.db("heroku_j59dvfgm");
         const myobj = {
-          endpoint: endpoint,
+          endpoint: handleSlashes(endpoint),
           json: mockJSON,
           date_added: new Date(),
           type: actionType
@@ -63,7 +80,10 @@ module.exports = function () {
       if (err) throw err;
 
       const dbo = db.db('heroku_j59dvfgm');
-      const myObj = { endpoint: req.originalUrl, type: req.method.toUpperCase() };
+      const myObj = {
+        endpoint: handleSlashes(req.originalUrl),
+        type: req.method.toUpperCase()
+      };
 
       // Provide the latest one
       dbo.collection("apis").find(myObj).sort( { _id : -1 } ).limit(1).toArray(function(err, results = []){
