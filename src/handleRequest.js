@@ -13,6 +13,7 @@ module.exports = function () {
         slashStr = '/' + slashStr;
       }
 
+      // Trailing slash
       if(str[str.length - 1] !== '/') {
         slashStr = slashStr + '/';
       }
@@ -25,6 +26,7 @@ module.exports = function () {
    * Function that handles submission of API
    */
   const mockSubmitAPI = (req, res) => {
+
     // Connect to the DB
     MongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
 
@@ -34,6 +36,15 @@ module.exports = function () {
       const endpoint = req.body.endpoint;
       const mockJSON = req.body.value ? req.body.value : {};
       const actionType = req.body.type ? req.body.type : 'POST';
+      const splitEndpointURL = endpoint.split('?');
+      const rootURL = splitEndpointURL[0];
+      let queryParams = {};
+
+      if(splitEndpointURL.length > 1) {
+        const querystring = require('querystring');
+        queryParams = querystring.parse(splitEndpointURL[1]);
+      }
+
 
       // If endpoint is not present, throw error
       if(!endpoint) {
@@ -46,7 +57,8 @@ module.exports = function () {
       try {
         const dbo = db.db("heroku_j59dvfgm");
         const myobj = {
-          endpoint: handleSlashes(endpoint),
+          endpoint: handleSlashes(rootURL),
+          queryParams: queryParams,
           json: mockJSON,
           date_added: new Date(),
           type: actionType
@@ -79,16 +91,30 @@ module.exports = function () {
     MongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
       if (err) throw err;
 
+      const splitEndpointURL = req.originalUrl.split('?');
+      const rootURL = splitEndpointURL[0];
+      let queryParams = {};
+
+      if(splitEndpointURL.length > 1) {
+        const querystring = require('querystring');
+        queryParams = querystring.parse(splitEndpointURL[1]);
+      }
+
       const dbo = db.db('heroku_j59dvfgm');
       const myObj = {
-        endpoint: handleSlashes(req.originalUrl),
+        endpoint: handleSlashes(rootURL),
         type: req.method.toUpperCase()
       };
 
       // Provide the latest one
       dbo.collection("apis").find(myObj).sort( { _id : -1 } ).limit(1).toArray(function(err, results = []){
         if(results.length > 0) {
-            res.send(results[0].json);
+            const equal = require('deep-equal');
+            if(equal(queryParams, results[0].queryParams)) {
+              res.send(results[0].json);
+            } else {
+              res.send({status: false, message: 'No results found'});
+            }
         } else {
           res.send({status: false, message: 'No results found'});
         }

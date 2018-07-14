@@ -48,7 +48,7 @@ app.post('/mock-submit-api',(req, res) => {
 
 // Generic method to handle any request
 app.all('*', (req, res, next) => {
-  if(req.method.toUpperCase() === 'GET' && req.originalUrl.indexOf('assets') > 0) {
+  if(req.method.toUpperCase() === 'GET' && (req.originalUrl.indexOf('assets') > -1 || req.originalUrl.indexOf('favicon') > -1)) {
     next();
   } else {
     handleRequest.fetchAPI(req, res);
