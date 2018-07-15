@@ -4,6 +4,23 @@ const url = process.env.NODE_ENV == 'production' ? process.env.MONGODB_URI : "mo
 
 module.exports = function () {
 
+  const determineContentType = (contentType) => {
+
+    if(contentType.indexOf('application/x-www-form-urlencoded') > -1) {
+      return 'application/x-www-form-urlencoded';
+    }
+
+    if(contentType.indexOf('multipart/form-data') > -1) {
+      return 'multipart/form-data';
+    }
+
+    if(contentType.indexOf('application/json') > -1) {
+      return 'application/json';
+    }
+
+    return null;
+  }
+
   const handleSlashes = (str) => {
     var slashStr = str;
 
@@ -28,15 +45,28 @@ module.exports = function () {
   const mockSubmitAPI = (req, res) => {
 
     // Connect to the DB
-    MongoClient.connect(url, { useNewUrlParser: true }, function(err, db) {
+    MongoClient.connect(url, { useNewUrlParser: true }, (err, db) => {
 
       if (err) throw err;
 
       // Fetch the values
       const endpoint = req.body.endpoint;
+
+      // If endpoint is not present, throw error
+      if(!endpoint) {
+        res.send({
+          status: false,
+          message: 'Endpoint is missing'
+        });
+        return;
+      }
+
       const mockJSON = req.body.value ? req.body.value : {};
       const actionType = req.body.type ? req.body.type : 'POST';
+      const contentType = req.body.contentType ? req.body.contentType : null;
+      const bodyParams = req.body.bodyparams ? req.body.bodyparams : {};
       const splitEndpointURL = endpoint.split('?');
+
       const rootURL = splitEndpointURL[0];
       let queryParams = {};
 
@@ -45,27 +75,20 @@ module.exports = function () {
         queryParams = querystring.parse(splitEndpointURL[1]);
       }
 
-
-      // If endpoint is not present, throw error
-      if(!endpoint) {
-        res.send({
-          status: false,
-          message: 'Endpoint is missing'
-        });
-      }
-
       try {
         const dbo = db.db("heroku_j59dvfgm");
         const myobj = {
           endpoint: handleSlashes(rootURL),
           queryParams: queryParams,
           json: mockJSON,
+          bodyParams: bodyParams,
           date_added: new Date(),
-          type: actionType
+          type: actionType,
+          contentType: contentType
         };
 
         // Insert Document into the mongodb
-        dbo.collection("apis").insertOne(myobj, function(err, res1) {
+        dbo.collection("apis").insertOne(myobj, (err, res1) => {
           if (err) throw err;
 
           res.send({status: true});
@@ -94,6 +117,8 @@ module.exports = function () {
       const splitEndpointURL = req.originalUrl.split('?');
       const rootURL = splitEndpointURL[0];
       let queryParams = {};
+      const bodyParams = req.body;
+      const contentType = req.method !== 'GET' ? determineContentType(req.headers['content-type']) : null;
 
       if(splitEndpointURL.length > 1) {
         const querystring = require('querystring');
@@ -103,18 +128,22 @@ module.exports = function () {
       const dbo = db.db('heroku_j59dvfgm');
       const myObj = {
         endpoint: handleSlashes(rootURL),
-        type: req.method.toUpperCase()
+        type: req.method.toUpperCase(),
+        contentType: contentType
       };
 
       // Provide the latest one
-      dbo.collection("apis").find(myObj).sort( { _id : -1 } ).limit(1).toArray(function(err, results = []){
+      dbo.collection("apis").find(myObj).sort( { _id : -1 } ).limit(1).toArray((err, results = []) => {
         if(results.length > 0) {
+
             const equal = require('deep-equal');
-            if(equal(queryParams, results[0].queryParams)) {
+
+            if(equal(queryParams, results[0].queryParams) && equal(bodyParams, results[0].bodyParams)) {
               res.send(results[0].json);
             } else {
               res.send({status: false, message: 'No results found'});
             }
+
         } else {
           res.send({status: false, message: 'No results found'});
         }

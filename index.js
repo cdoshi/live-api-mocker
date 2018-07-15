@@ -3,6 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const path = require('path');
 const handleRequest = require('./src/handleRequest')();
+const multer = require('multer');
+const upload = multer();
 
 // Serve only files from public folder
 app.use("/", express.static(path.join(__dirname, '/public')));
@@ -34,6 +36,9 @@ app.use(function(err, req, res, next) {
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+
+app.use(upload.array());
+
 
 // Any get request would be routed to the home page
 app.get('/', (req, res) => {

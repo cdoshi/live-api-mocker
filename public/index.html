@@ -39,12 +39,29 @@
       <br><br>
       <div class="form-group">
         <select class="form-control" id="methodType">
-          <option>POST</option>
+          <option selected>POST</option>
           <option>GET</option>
           <option>PUT</option>
           <option>DELETE</option>
         </select>
       </div>
+
+      <div id="bodyParams">
+        <label for="contentType" id="bodyParamsLabel">Body Content Type</label>
+        <select class="form-control" id="contentType">
+          <option selected>multipart/form-data</option>
+          <option>application/x-www-form-urlencoded</option>
+          <option>application/json</option>
+        </select>
+        <br>
+
+        <div class="form-group">
+          <label for="jsonTextarea" id="bodyParamsLabel">Paste your body params here</label>
+          <textarea class="form-control" id="bodyParamsarea" rows="5" data-toggle="tooltip" data-placement="top" title="Invalid body">{}</textarea>
+        </div>
+      </div>
+
+
 
       <div class="form-group">
         <label for="jsonTextarea" id="textareaLabel">Paste your JSON here</label>
@@ -75,12 +92,20 @@
     // Show tooltip for 2 seconds before closing it
     $("[data-toggle='tooltip']").on('shown.bs.tooltip', function(){
       setTimeout(function() {
-        $('#jsonTextarea').tooltip('hide');
+        $('#jsonTextarea,#bodyParamsarea').tooltip('hide');
       }, 2000);
     });
 
     // Trigger the tooltip manually via JS
-    $('#jsonTextarea').tooltip({trigger: 'manual'});
+    $('#jsonTextarea,#bodyParamsarea').tooltip({trigger: 'manual'});
+
+    $('#methodType').change(function() {
+      if(this.value == 'GET') {
+        $('#bodyParams').hide();
+      } else {
+        $('#bodyParams').show();
+      }
+    });
 
     // Change the label on user entering endpoint
     $('#inputEndpoint,#methodType').on('change input',function() {
@@ -92,6 +117,7 @@
     $('#formSubmit').click(function() {
       var endpoint = $('#inputEndpoint').val().trim();
       var jsonText = $('#jsonTextarea').val().trim();
+      var bodyText = $('#bodyParamsarea').val().trim();
 
       // If end point has not been provided focus it
       if(!endpoint) {
@@ -107,11 +133,24 @@
         return false;
       }
 
+      if($('#methodType').val() !== 'GET') {
+        try {
+          bodyText = JSON.parse(bodyText);
+        } catch(e) {
+          $('#bodyParamsarea').focus();
+          $('#bodyParamsarea').tooltip('show');
+          return false;
+        }
+      }
+
+
       // Submit the api
       $.post('/mock-submit-api', {
         endpoint: endpoint,
         value: jsonText,
-        type: $('#methodType').val()
+        type: $('#methodType').val(),
+        bodyparams: ($('#methodType').val() !== 'GET') ? bodyText : {},
+        contentType: ($('#contentType').val() !== 'GET') ? $('#contentType').val() : null
       },function(response) {
         if(response.status == true) {
           $('#snackbar').text('Submitted successfully!');
