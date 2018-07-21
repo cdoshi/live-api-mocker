@@ -201,7 +201,7 @@
         value: jsonText,
         type: $('#methodType').val(),
         bodyparams: ($('#methodType').val() !== 'GET') ? bodyText : {},
-        contentType: ($('#contentType').val() !== 'GET') ? $('#contentType').val() : null
+        contentType: ($('#methodType').val() !== 'GET') ? $('#contentType').val() : null
       },function(response) {
         if(response.status == true) {
           $('#snackbar').text('Submitted successfully!');
