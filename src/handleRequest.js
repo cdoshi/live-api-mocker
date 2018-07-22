@@ -118,7 +118,7 @@ module.exports = function () {
       const rootURL = splitEndpointURL[0];
       let queryParams = {};
       const bodyParams = req.body;
-      const contentType = req.method !== 'GET' ? determineContentType(req.headers['content-type']) : null;
+      const contentType = (req.method !== 'GET' && req.headers['content-type']) ? determineContentType(req.headers['content-type']) : null;
 
       if(splitEndpointURL.length > 1) {
         const querystring = require('querystring');
