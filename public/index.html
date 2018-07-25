@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title> Live API Mocker:Mock your apis live instantly </title>
+  <title> Live API Mocker: Mock your apis instantly </title>
   <meta name="description" content="Test your code with real APIs providing your mock data. Once you submit the request with mock data, it is live instantly. No fuss.
-">
+  ">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="google-site-verification" content="6McT_jgt_2I2mGEkOvO5VCG46uQJAMGigKcY62e9KJ0" />
   <link rel="preload" as="style" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" onload="this.rel='stylesheet'">
@@ -11,49 +11,49 @@
   <style>
   /* The snackbar - position it at the bottom and in the middle of the screen */
   #snackbar {
-      visibility: hidden; /* Hidden by default. Visible on click */
-      min-width: 250px; /* Set a default minimum width */
-      margin-left: -125px; /* Divide value of min-width by 2 */
-      background-color: #333; /* Black background color */
-      color: #fff; /* White text color */
-      text-align: center; /* Centered text */
-      border-radius: 2px; /* Rounded borders */
-      padding: 16px; /* Padding */
-      position: fixed; /* Sit on top of the screen */
-      z-index: 1; /* Add a z-index if needed */
-      left: 50%; /* Center the snackbar */
-      bottom: 30px; /* 30px from the bottom */
+    visibility: hidden; /* Hidden by default. Visible on click */
+    min-width: 250px; /* Set a default minimum width */
+    margin-left: -125px; /* Divide value of min-width by 2 */
+    background-color: #333; /* Black background color */
+    color: #fff; /* White text color */
+    text-align: center; /* Centered text */
+    border-radius: 2px; /* Rounded borders */
+    padding: 16px; /* Padding */
+    position: fixed; /* Sit on top of the screen */
+    z-index: 1; /* Add a z-index if needed */
+    left: 50%; /* Center the snackbar */
+    bottom: 30px; /* 30px from the bottom */
   }
 
   /* Show the snackbar when clicking on a button (class added with JavaScript) */
   #snackbar.show {
-      visibility: visible; /* Show the snackbar */
+    visibility: visible; /* Show the snackbar */
 
-  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
-  However, delay the fade out process for 2.5 seconds */
-      -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
-      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
+    However, delay the fade out process for 2.5 seconds */
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
   }
 
   /* Animations to fade the snackbar in and out */
   @-webkit-keyframes fadein {
-      from {bottom: 0; opacity: 0;}
-      to {bottom: 30px; opacity: 1;}
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
   }
 
   @keyframes fadein {
-      from {bottom: 0; opacity: 0;}
-      to {bottom: 30px; opacity: 1;}
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
   }
 
   @-webkit-keyframes fadeout {
-      from {bottom: 30px; opacity: 1;}
-      to {bottom: 0; opacity: 0;}
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
   }
 
   @keyframes fadeout {
-      from {bottom: 30px; opacity: 1;}
-      to {bottom: 0; opacity: 0;}
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
   }
 
   #inputEndpointLabel {
@@ -66,33 +66,39 @@
     margin-top: 20px;
   }
   #endpointDiv {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
   }
+
+  .method-container {
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+  }
+
   </style>
 
 </head>
 <body>
   <div id="container">
 
-    <div>
-      <table>
-        <tbody>
-          <tr>
-            <td><label for="inputEndpoint" id="inputEndpointLabel">https://live-api-mocker.herokuapp.com</label></td>
-            <td><input type="text" class="form-control" id="inputEndpoint" placeholder="/users/v1"></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <br><br>
-      <div class="form-group">
-        <select class="form-control" id="methodType">
-          <option selected>POST</option>
-          <option>GET</option>
-          <option>PUT</option>
-          <option>DELETE</option>
-        </select>
+    <div class="input-group mb-3 method-container">
+      <div class="input-group-prepend">
+        <div>
+          <select class="form-control" id="methodType">
+            <option>POST</option>
+            <option selected>GET</option>
+            <option>PUT</option>
+            <option>DELETE</option>
+          </select>
+        </div>
       </div>
+      <div class="input-group">
+        <span class="input-group-text" id="inputEndpointLabel">https://live-api-mocker.herokuapp.com</span>
+        <input type="text" class="form-control" id="inputEndpoint" placeholder="/users/v1">
+      </div>
+    </div>
+    <div>
 
       <div id="bodyParams">
         <label for="contentType" id="bodyParamsLabel">Body Content Type</label>
@@ -104,12 +110,10 @@
         <br>
 
         <div class="form-group">
-          <label for="jsonTextarea" id="bodyParamsLabel">Paste your body params here</label>
+          <label for="jsonTextarea" id="bodyParamsLabel"> Paste your body params here </label>
           <textarea class="form-control" id="bodyParamsarea" rows="5" data-toggle="tooltip" data-placement="top" title="Invalid body">{}</textarea>
         </div>
       </div>
-
-
 
       <div class="form-group">
         <label for="jsonTextarea" id="textareaLabel">Paste your JSON here</label>
@@ -124,13 +128,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+
     <script>
+    $('#bodyParams').hide();
 
     // Detect text change and format json if needed
-    $('#jsonTextarea').on('blur',function() {
+    $('#jsonTextarea, #bodyParamsarea').on('blur',function() {
       try {
         var jsonText = $(this).val();
-        var jsonTextFormatted = JSON.stringify(JSON.parse(jsonText), undefined,4);
+        var jsonTextFormatted = JSON.stringify(JSON.parse(jsonText), undefined, 4);
         $(this).val(jsonTextFormatted);
       } catch(e) {}
     });
@@ -213,17 +219,18 @@
       });
     });
 
+    // Function to show the snackbar
     function showSnackbar() {
 
-    // Get the snackbar DIV
-    var x = document.getElementById("snackbar");
+      // Get the snackbar DIV
+      var x = document.getElementById("snackbar");
 
-    // Add the "show" class to DIV
-    x.className = "show";
+      // Add the "show" class to DIV
+      x.className = "show";
 
-    // After 3 seconds, remove the show class from DIV
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-}
+      // After 3 seconds, remove the show class from DIV
+      setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
 
     </script>
   </body>
