@@ -75,15 +75,20 @@
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
   }
+  
+  .method-parent {
+    -webkit-box-flex: 1;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto
+  }
 
   </style>
-
 </head>
+
 <body>
   <div id="container">
-
     <div class="input-group mb-3 method-container">
-      <div class="input-group-prepend">
+      <div class="input-group-prepend method-parent">
         <div>
           <select class="form-control" id="methodType">
             <option>POST</option>
