@@ -5,6 +5,8 @@ const path = require('path');
 const handleRequest = require('./src/handleRequest')();
 const multer = require('multer');
 const upload = multer();
+const cors = require('cors');
+
 
 // Serve only files from public folder
 app.use("/", express.static(path.join(__dirname, '/public')));
@@ -14,11 +16,7 @@ const MongoClient = require('mongodb').MongoClient;
 const url = process.env.NODE_ENV == 'production' ? process.env.MONGODB_URI : "mongodb://localhost:27017/";
 
 // Enable cors
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
+app.use(cors());
 
 // Below code is needed to read the params from POST request
 app.use(bodyParser.json());
@@ -38,7 +36,6 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use(upload.array());
-
 
 // Any get request would be routed to the home page
 app.get('/', (req, res) => {
