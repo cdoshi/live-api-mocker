@@ -61,7 +61,7 @@ module.exports = function () {
         return;
       }
 
-      const mockJSON = req.body.value ? req.body.value : {};
+      const mockJSON = req.body.value ? JSON.parse(req.body.value) : {};
       const actionType = req.body.type ? req.body.type : 'POST';
       const contentType = req.body.contentType ? req.body.contentType : null;
       const bodyParams = req.body.bodyparams ? req.body.bodyparams : {};

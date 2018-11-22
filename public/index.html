@@ -75,7 +75,7 @@
     -ms-flex-wrap: nowrap;
     flex-wrap: nowrap;
   }
-  
+
   .method-parent {
     -webkit-box-flex: 1;
     -ms-flex: 1 0 auto;
@@ -209,7 +209,7 @@
       // Submit the api
       $.post('/mock-submit-api', {
         endpoint: endpoint,
-        value: jsonText,
+        value: JSON.stringify(jsonText),
         type: $('#methodType').val(),
         bodyparams: ($('#methodType').val() !== 'GET') ? bodyText : {},
         contentType: ($('#methodType').val() !== 'GET') ? $('#contentType').val() : null
