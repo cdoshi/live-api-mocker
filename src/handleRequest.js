@@ -129,16 +129,15 @@ module.exports = function () {
       const myObj = {
         endpoint: handleSlashes(rootURL),
         type: req.method.toUpperCase(),
-        contentType: contentType
+        contentType: contentType,
+        queryParams: queryParams,
       };
 
       // Provide the latest one
       dbo.collection("apis").find(myObj).sort( { _id : -1 } ).limit(1).toArray((err, results = []) => {
         if(results.length > 0) {
-
             const equal = require('deep-equal');
-
-            if(equal(queryParams, results[0].queryParams) && equal(bodyParams, results[0].bodyParams)) {
+            if(equal(bodyParams, results[0].bodyParams)) {
               res.send(results[0].json);
             } else {
               res.send({status: false, message: 'No results found'});
